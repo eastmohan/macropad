@@ -27,6 +27,7 @@ M3 heat set inserts - 4 <br/>
 <img width="811" height="1023" alt="image" src="https://github.com/user-attachments/assets/0328e86f-3e59-41ee-a75b-d4d254b6d1d2" />
 <img width="905" height="1091" alt="image" src="https://github.com/user-attachments/assets/c166404c-2dd5-46e7-aaeb-566d9180e329" />
 <img width="722" height="911" alt="image" src="https://github.com/user-attachments/assets/fa0eac89-b6e2-4b76-a9ca-ea6c8d3ffd5f" />
+<img width="1341" height="1077" alt="image" src="https://github.com/user-attachments/assets/741f72b7-30b5-41c6-a6cc-a1b8122e46f0" />
 
 
 

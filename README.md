@@ -21,13 +21,19 @@ RF_Module:MCU_Seeed_ESP32C3 - 1 <br />
 M3 x 16mm screws - 4 <br/>
 M3 heat set inserts - 4 <br/>
 
-<img width="1372" height="1189" alt="image" src="https://github.com/user-attachments/assets/71b1eb95-d332-41ce-bd85-809183511ff8" />
+<img width="1328" height="934" alt="image" src="https://github.com/user-attachments/assets/3ffe773b-38d3-4659-96aa-cef95d34b293" />
+
 <img width="1458" height="769" alt="image" src="https://github.com/user-attachments/assets/d82b9994-aecc-4021-a66b-5986f12d65a0" />
-<img width="747" height="931" alt="image" src="https://github.com/user-attachments/assets/3c22f086-62a7-449b-b8ce-33cb6cf44d4a" />
-<img width="811" height="1023" alt="image" src="https://github.com/user-attachments/assets/0328e86f-3e59-41ee-a75b-d4d254b6d1d2" />
-<img width="905" height="1091" alt="image" src="https://github.com/user-attachments/assets/c166404c-2dd5-46e7-aaeb-566d9180e329" />
-<img width="722" height="911" alt="image" src="https://github.com/user-attachments/assets/fa0eac89-b6e2-4b76-a9ca-ea6c8d3ffd5f" />
-<img width="1341" height="1077" alt="image" src="https://github.com/user-attachments/assets/741f72b7-30b5-41c6-a6cc-a1b8122e46f0" />
+<img width="1117" height="1380" alt="image" src="https://github.com/user-attachments/assets/21acacd1-6c8b-455c-bc2f-370e3bdbc291" />
+<img width="772" height="974" alt="image" src="https://github.com/user-attachments/assets/41cf5c35-87d8-4b70-9393-72aa9bf670f7" />
+<img width="748" height="888" alt="image" src="https://github.com/user-attachments/assets/cd530970-efd6-49eb-9954-bf12ca195609" />
 
 
+
+<img width="821" height="884" alt="image" src="https://github.com/user-attachments/assets/6ad651f8-6977-46c5-870c-7d06d536a565" />
+
+<img width="1364" height="1084" alt="image" src="https://github.com/user-attachments/assets/0bc2bd40-5bf2-4774-b181-1772af81d38a" />
+
+
+<img width="1363" height="615" alt="image" src="https://github.com/user-attachments/assets/3f3174dd-c032-48b9-92d3-3d6cd5ceae30" />
 

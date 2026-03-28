@@ -20,6 +20,8 @@ RF_Module:MCU_Seeed_ESP32C3 - 1 <br />
 <br />
 M3 x 16mm screws - 4 <br/>
 M3 heat set inserts - 4 <br/>
+![PXL_20260328_025533167](https://github.com/user-attachments/assets/ee4a1262-0e57-45fd-b11e-73e5ede3a147)
+
 
 <img width="1328" height="934" alt="image" src="https://github.com/user-attachments/assets/3ffe773b-38d3-4659-96aa-cef95d34b293" />
 

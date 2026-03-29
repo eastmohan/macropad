@@ -9,6 +9,8 @@ to use the oled for now playing, first install rainmeter and then add the skin i
 for personal use  <br />
 not for commercial use  <br />
 
+**Demo:** https://www.youtube.com/watch?v=B0LNcNpDYtY
+
 **BOM:** <br />
 SK6812MINI-E mini LED - 2 <br />
 Resistor_SMD:R_0402_1005Metric <br />

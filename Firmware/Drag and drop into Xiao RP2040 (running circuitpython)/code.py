@@ -22,24 +22,32 @@ kbd    = Keyboard(usb_hid.devices)
 layout = KeyboardLayoutUS(kbd)
 
 # ── MACRO KEYS ────────────────────────────────────────────────────────────
-# (pin,       action_type,  action)
-# action_type: "cc" = ConsumerControl, "key" = keyboard combo
 KEY_PINS = (
-    board.A0,   # SW1 — Ctrl+C
-    board.A1,   # SW2 — Previous Track
-    board.A2,   # SW3 — Ctrl+V
-    board.A3,   # SW4 — Play/Pause
-    board.TX,   # SW6 — Next Track
-    board.RX,   # SW5 — Win+Shift+S (snip)
+    board.A0,
+    board.A1,
+    board.A2,
+    board.A3,
+    board.TX,
+    board.RX,
 )
+
 KEY_ACTIONS = (
-    ("key", (Keycode.CONTROL, Keycode.C)),
+    ("key", (Keycode.CONTROL, Keycode.C)),   # Copy
     ("cc",  ConsumerControlCode.SCAN_PREVIOUS_TRACK),
-    ("key", (Keycode.CONTROL, Keycode.V)),
+    ("key", (Keycode.CONTROL, Keycode.V)),   # Paste
     ("cc",  ConsumerControlCode.PLAY_PAUSE),
     ("cc",  ConsumerControlCode.SCAN_NEXT_TRACK),
-    ("key", (Keycode.WINDOWS, Keycode.SHIFT, Keycode.S)),
+    ("toggle_led", None),
 )
+
+KEY_LABELS = {
+    (Keycode.CONTROL, Keycode.C): "Copy",
+    (Keycode.CONTROL, Keycode.V): "Paste",
+    (Keycode.CONTROL, Keycode.Z): "Undo",
+    ConsumerControlCode.SCAN_PREVIOUS_TRACK: "Prev Track",
+    ConsumerControlCode.SCAN_NEXT_TRACK: "Next Track",
+    ConsumerControlCode.PLAY_PAUSE: "Play / Pause",
+}
 
 _keys = []
 for _p in KEY_PINS:
@@ -51,28 +59,75 @@ for _p in KEY_PINS:
 _key_prev = [False] * len(_keys)
 
 def _send_key(action):
+    global _leds_enabled
+    global _oled_sleep
+
     kind, val = action
+
     if kind == "cc":
         cc.send(val)
+        show_overlay(KEY_LABELS.get(val, "Media"))
+
     elif kind == "key":
         kbd.press(*val)
         kbd.release_all()
+        show_overlay(KEY_LABELS.get(val, "Key Combo"))
+
+    elif kind == "toggle_led":
+        _leds_enabled = not _leds_enabled
+
+        if _leds_enabled:
+            _oled_sleep = False
+            show_overlay("LEDs ON")
+
+        else:
+            show_overlay("LEDs OFF")
+
+            pixels.fill((0, 0, 0))
+            pixels.show()
+
+            onboard.fill((0, 0, 0))
+            onboard.show()
+
+            _oled_sleep = True
 
 # ── ROTARY ENCODER ────────────────────────────────────────────────────────
 encoder = rotaryio.IncrementalEncoder(board.MOSI, board.SCK)
 _enc_last = encoder.position
 
-# ── SK6812 MINI LEDs ─────────────────────────────────────────────────────
-# These LEDs have swapped R/B — (0,255,0,0) shows as blue on your batch
+# ── SK6812 MINI LEDs (macropad) ──────────────────────────────────────────
 pixels = neopixel.NeoPixel(
-    board.MISO, 2,
-    brightness=0.25,
+    board.MISO,
+    2,
+    brightness=0.5,
     auto_write=False,
-    pixel_order=neopixel.GRBW
+    pixel_order=neopixel.GRB
 )
-pixels[0] = (0, 0, 255, 0)   # trying blue for top
-pixels[1] = (255, 0, 0, 0)   # trying blue for bottom
-pixels.show()
+
+# ── Onboard XIAO RP2040 LED ──────────────────────────────────────────────
+onboard = neopixel.NeoPixel(
+    board.NEOPIXEL,
+    1,
+    brightness=0.2,
+    auto_write=False,
+    pixel_order=neopixel.GRB
+)
+
+def _wheel(pos):
+    pos = pos % 255
+
+    if pos < 85:
+        return (255 - pos * 3, pos * 3, 0, 0)
+    elif pos < 170:
+        pos -= 85
+        return (0, 255 - pos * 3, pos * 3, 0)
+    else:
+        pos -= 170
+        return (pos * 3, 0, 255 - pos * 3, 0)
+
+_hue = 0
+_leds_enabled = True
+_oled_sleep = False
 
 # ── OLED SSD1306 128x32 ───────────────────────────────────────────────────
 _i2c = busio.I2C(board.SCL, board.SDA)
@@ -84,22 +139,27 @@ _MAX_SONG   = 10
 def _oled_refresh(artist, song):
     oled.fill(0)
     oled.text(song[:_MAX_SONG], 0, 0, 1)
+
     src_w = _MAX_SONG * 6
     pixels_on = []
+
     for y in range(8):
         for x in range(src_w):
             if oled.pixel(x, y):
                 pixels_on.append((x, y))
+
     oled.fill(0)
     oled.text(artist[:_MAX_ARTIST], 0, 0, 1)
+
     for (x, y) in pixels_on:
         dx = x * 2
         dy = y * 2 + 16
         if dy + 1 < 32:
-            oled.pixel(dx,     dy,     1)
-            oled.pixel(dx + 1, dy,     1)
-            oled.pixel(dx,     dy + 1, 1)
+            oled.pixel(dx, dy, 1)
+            oled.pixel(dx + 1, dy, 1)
+            oled.pixel(dx, dy + 1, 1)
             oled.pixel(dx + 1, dy + 1, 1)
+
     oled.show()
 
 _oled_refresh("Now Playing", "Waiting...")
@@ -107,6 +167,7 @@ _oled_refresh("Now Playing", "Waiting...")
 # ── SCROLLING ─────────────────────────────────────────────────────────────
 _SCROLL_SPD = 0.22
 _PAUSE_LEN  = 1.8
+
 _line1_txt    = "Now Playing"
 _scroll_txt   = "Waiting..."
 _scroll_pos   = 0
@@ -116,11 +177,13 @@ _scroll_ts    = 0.0
 def _visible():
     if len(_scroll_txt) <= _MAX_SONG:
         return _scroll_txt
-    return _scroll_txt[_scroll_pos: _scroll_pos + _MAX_SONG]
+    return _scroll_txt[_scroll_pos:_scroll_pos + _MAX_SONG]
 
 def set_now_playing(raw):
     global _line1_txt, _scroll_txt, _scroll_pos, _scroll_state, _scroll_ts
+
     raw = raw.strip()
+
     if " - " in raw:
         title, artist = raw.split(" - ", 1)
         _line1_txt  = artist[:_MAX_ARTIST]
@@ -128,33 +191,62 @@ def set_now_playing(raw):
     else:
         _line1_txt  = "Now Playing"
         _scroll_txt = raw
+
     _scroll_pos   = 0
     _scroll_state = "pause_start"
     _scroll_ts    = time.monotonic()
+
     _oled_refresh(_line1_txt, _visible())
 
 def _tick_scroll(now):
     global _scroll_pos, _scroll_state, _scroll_ts
+
     if len(_scroll_txt) <= _MAX_SONG:
         return
+
     max_pos = len(_scroll_txt) - _MAX_SONG
+
     if _scroll_state == "pause_start":
         if now - _scroll_ts >= _PAUSE_LEN:
             _scroll_state = "scrolling"
             _scroll_ts = now
+
     elif _scroll_state == "scrolling":
         if now - _scroll_ts >= _SCROLL_SPD:
             _scroll_pos = min(_scroll_pos + 1, max_pos)
             _oled_refresh(_line1_txt, _visible())
             _scroll_ts = now
+
             if _scroll_pos >= max_pos:
                 _scroll_state = "pause_end"
+
     elif _scroll_state == "pause_end":
         if now - _scroll_ts >= _PAUSE_LEN:
             _scroll_pos = 0
             _scroll_state = "pause_start"
             _scroll_ts = now
             _oled_refresh(_line1_txt, _visible())
+
+# ── OLED OVERLAY SYSTEM ───────────────────────────────────────────────────
+_overlay_text = None
+_overlay_until = 0
+_overlay_active = False
+
+def show_overlay(text):
+    
+    
+
+    
+    global _overlay_text, _overlay_until, _overlay_active
+
+    _overlay_text = text
+    _overlay_until = time.monotonic() + 1.5
+    _overlay_active = True
+
+    oled.fill(0)
+    oled.text("KEY:", 0, 0, 1)
+    oled.text(text[:21], 0, 16, 1)
+    oled.show()
 
 # ── SERIAL ────────────────────────────────────────────────────────────────
 _serial = usb_cdc.data
@@ -169,8 +261,10 @@ while True:
         _delta = _pos - _enc_last
         _code  = (ConsumerControlCode.VOLUME_INCREMENT
                   if _delta > 0 else ConsumerControlCode.VOLUME_DECREMENT)
+
         for _ in range(min(abs(_delta), 5)):
             cc.send(_code)
+
         _enc_last = _pos
 
     # Macro keys
@@ -186,5 +280,33 @@ while True:
         if _line:
             set_now_playing(_line.decode("utf-8"))
 
-    _tick_scroll(_now)
+        # ── LEDs (rainbow synced) ───────────────────────────────────────────
+    if _leds_enabled:
+        _hue = (_hue + 1) % 255
+        color = _wheel(_hue)
+
+        pixels[0] = color
+        pixels[1] = color
+        pixels.show()
+
+        onboard[0] = color
+        onboard.show()
+
+    # ── OLED update logic ────────────────────────────────────────────────
+    if _overlay_active:
+        if time.monotonic() >= _overlay_until:
+            _overlay_active = False
+
+            if _oled_sleep:
+                oled.fill(0)
+                oled.show()
+            else:
+                _oled_refresh(_line1_txt, _visible())
+
+    elif _oled_sleep:
+        pass
+
+    else:
+        _tick_scroll(_now)
+
     time.sleep(0.005)

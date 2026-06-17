@@ -2,14 +2,27 @@
 macropad with 6 keys, 1 rotary encoder, 1 0.91" oled, 2 micro eleds
 
 rotary encoder: set to control volume  <br />
-keys: mapped to open apps, skip/pause songs, etc.  <br />
+keys: mapped to skip/pause songs, turn LEDs and OLED on/off, copy, and paste.  <br />
 oled displays current song + artist  <br />
-micro eleds show status (plugged in, on)  <br />  <br />
+micro eleds and the XIAO onboard LED all cycle a rainbow (synced)  <br />  <br />
 to use the oled for now playing, first install rainmeter and then add the skin in this repo. you may need a chrome extension to get now playing info from chrome. it should refresh every few seconds and save the song and artist to a txt file in the rainmeter folder, which the python script reads and prints to the oled.  <br />  <br />
 for personal use  <br />
 not for commercial use  <br />
 
-**Demo:** https://www.youtube.com/watch?v=B0LNcNpDYtY
+**Demo:** https://www.youtube.com/watch?v=B0LNcNpDYtY </br><br>
+**Updates since recording:**</br><br>
+  Upper left button:
+-   On/off button for the LEDs and OLED
+-   Upon pressing to turn off, OLED displays a message and LEDs turn off. After a short delay, the OLED powers off as well.
+-   When powering on, LEDs turn on immediately and OLED displays a message before going back to song information <br><br>
+  OLED:
+    Now shows messages for button presses:
+-    KEY: Copy
+-    KEY: Paste
+-    KEY: LEDs ON/OFF
+-    KEY: Prev Track
+-    KEY: Play/Pause
+-  KEY: Next Track
 
 **BOM:** <br />
 SK6812MINI-E mini LED - 2 <br />
